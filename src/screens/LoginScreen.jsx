@@ -14,7 +14,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../context/AuthContext";
 import logo from "../../assets/logo.png";
-import { login as loginService } from "../services/AuthService";
+// import { login as loginService } from "../services/AuthService"; // ❌ No se usa al omitir inicio de sesión
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -26,10 +26,17 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      const response = await loginService(email, password_);
-      login(response); // Guardar el usuario en el contexto
-      setLoading(false);
-      navigation.navigate("Home");
+
+      // ❌ OMITIMOS el llamado al servicio real de login
+      // const response = await loginService(email, password_);
+      // login(response); // Guardar el usuario en el contexto
+
+      // ✅ Navegar directamente al Home sin validar
+      setTimeout(() => {
+        setLoading(false);
+        navigation.navigate("Home");
+      }, 500);
+
     } catch (error) {
       setLoading(false);
       Alert.alert("Error", error.message);
@@ -37,13 +44,16 @@ export default function LoginScreen() {
   };
 
   // Verificar si ambos campos están completos
-  const isButtonDisabled = !(email && password_);
+  // const isButtonDisabled = !(email && password_);
+  const isButtonDisabled = false; // ✅ Siempre habilitado
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <Image source={logo} style={styles.logo} />
         <Text style={styles.title}>Iniciar Sesión</Text>
+
+        {/* ✅ Los inputs se mantienen visibles, pero ya no son requeridos */}
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -59,16 +69,19 @@ export default function LoginScreen() {
           onChangeText={setPassword_}
           secureTextEntry
         />
+
         <TouchableOpacity
           style={[styles.button, isButtonDisabled && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={isButtonDisabled}
         >
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+          <Text style={styles.buttonText}>Entrar sin sesión</Text>
         </TouchableOpacity>
+
         {/* <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.link}>Crear una cuenta</Text>
         </TouchableOpacity> */}
+
         {loading && (
           <ActivityIndicator
             size="large"
